@@ -1,0 +1,190 @@
+.pattern-visualization-container {
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+  position: relative;
+}
+
+.pattern-header-and-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 20px;
+  position: relative;
+  /* Removed padding-left: 20px; as anchor positioning changes */
+}
+
+.anchor-label-display {
+  display: flex;
+  align-items: center;
+  position: relative; /* Needed for pseudo-element positioning */
+  margin-left: 20px; /* Space from the left edge of the container */
+}
+
+.anchor-label-display::after {
+  content: '';
+  position: absolute;
+  left: calc(20px + 2px); /* Anchor's left padding + border-width */
+  top: 100%; /* Directly below the anchor box */
+  height: 20px; /* Short vertical segment */
+  width: 2px;
+  background-color: #333;
+  z-index: 0;
+}
+
+.anchor-box {
+  background-color: #ADD8E6;
+  border: 2px solid #333;
+  border-radius: 8px;
+  padding: 10px 20px;
+  font-weight: bold;
+  font-size: 1.2em;
+  z-index: 1;
+  text-align: center;
+}
+
+.pattern-controls {
+  /* No specific positioning needed here as it's part of the flex container */
+}
+
+.patterns-list-area {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  /* Adjust margin-left and padding-left to align with the vertical line from anchor */
+  margin-left: 42px; /* anchor-box-left-offset + vertical-line-width + gap */
+  padding-left: 20px; /* Space for the main vertical line */
+  padding-top: 0; /* No small offset from horizontal line anymore */
+}
+
+/* Main vertical line - now extends from the anchor's vertical segment */
+.patterns-list-area::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: -20px; /* Connects to the end of anchor-label-display::after */
+  height: var(--vertical-line-height, 20px); /* default to 20px for the initial segment */
+  width: 2px;
+  background-color: #333;
+}
+
+.pattern-row {
+  display: flex;
+  align-items: center;
+  position: relative;
+  margin-bottom: 25px;
+}
+
+/* New horizontal connector for the row itself, bridging the gap to the vertical line */
+.pattern-row::before {
+  content: '';
+  position: absolute;
+  left: -20px; /* Start at the vertical line (parent padding is 20px) */
+  top: 50%;
+  width: 20px; /* Bridge the 20px gap */
+  height: 2px;
+  background-color: #333;
+  transform: translateY(-50%);
+}
+
+.pattern-content {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  border-radius: 8px;
+  transition: all 0.2s ease-in-out;
+  padding: 8px;
+  position: relative; /* Positioning context for the tooltip */
+}
+
+.pattern-row.selected .pattern-content {
+  background-color: #e7f4e7;
+  box-shadow: 0 0 8px rgba(40, 167, 69, 0.4);
+}
+
+.pattern-node {
+  border-radius: 6px;
+  padding: 8px 12px;
+  margin: 0 5px;
+  font-family: monospace;
+  font-size: 0.95em;
+}
+
+.pattern-node.intermediate {
+  background-color: #f0f0f0;
+  border: 1px dashed #aaa;
+  color: #555;
+}
+
+.pattern-node.final {
+  background-color: #fff;
+  border: 1px solid #333;
+  font-weight: bold;
+}
+
+.pattern-row.selected .pattern-node.final {
+  border-color: #28a745;
+}
+
+.pattern-rel {
+  position: relative;
+  width: 150px; /* give it some width */
+  height: 2px;
+  background-color: #333;
+  margin: 0 10px;
+}
+
+.pattern-rel.first-rel {
+  /* Adjusted to connect cleanly to the left edge of the scaled content box */
+  margin-left: -8px; /* Just enough to counteract the 8px padding of .pattern-content */
+  width: 158px; /* 150px base + 8px to reach edge */
+}
+
+.pattern-rel::after {
+  /* arrowhead */
+  content: '';
+  position: absolute;
+  right: -4px;
+  top: -4px; /* to center it on the 2px line */
+  width: 10px;
+  height: 10px;
+  border-top: 2px solid #333;
+  border-right: 2px solid #333;
+  transform: rotate(45deg);
+}
+
+.pattern-rel-label {
+  position: absolute;
+  top: -20px;
+  left: 50%;
+  transform: translateX(-50%);
+  /* background-color: white; Remove white background */
+  padding: 0 5px;
+  font-size: 0.9em;
+  font-family: monospace; /* Change font to monospace */
+  color: #555;
+}
+
+.pattern-instances-tooltip {
+  position: absolute;
+  top: 50%; /* Position to the middle vertically */
+  left: 100%; /* Position to the right of the element */
+  transform: translateY(-50%) translateX(10px); /* Vertically center and add offset */
+  background-color: #2c2c2c;
+  color: white;
+  padding: 10px 15px;
+  border-radius: 6px;
+  white-space: nowrap;
+  z-index: 10;
+  /* margin-top: 10px; Removed */
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.pattern-instances-tooltip ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.pattern-instances-tooltip li {
+  padding: 2px 0;
+}
