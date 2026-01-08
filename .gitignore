@@ -22,9 +22,6 @@ Thumbs.db
 
 #files
 debug_schema.json
-docker-compose.yaml
-backend.Dockerfile
-frontend.Dockerfile
 
 #frontend
 gram-frontend/node_modules/
