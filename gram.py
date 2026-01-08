@@ -8,7 +8,7 @@ import itertools
 import uuid
 import pandas as pd
 import math
-
+from functools import lru_cache
 from bitarray import bitarray
 from itertools import combinations
 
@@ -211,6 +211,7 @@ class GramxNeo4j:
 
         print(f"[DEBUG] Relationship types identified as NOT many-to-one: {self.relationship_cardinality}")
 
+    @lru_cache(maxsize=64)
     def get_schema_for_cytoscape(self):
         """
         Get the schema in a format that Cytoscape.js can understand.
