@@ -1,22 +1,23 @@
-print("DEBUG: Script started.")
-from flask import Flask, jsonify, request, Response
+from flask import Flask, jsonify, request, Response, session
 from dotenv import load_dotenv
 import os
 import sys
 import json # Import json module
 import csv
 import io
+import uuid
 from flask_cors import CORS
 
 # Add the current directory to the python path
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
-from gramx_neo4j import GramxNeo4j
+from gram import GramxNeo4j
 
 load_dotenv()
 
 app = Flask(__name__)
-CORS(app, origins=["https://cerilab.deib.polimi.it/gram", "http://127.0.0.1:25302"])
+CORS(app, origins=["https://cerilab.deib.polimi.it/gram", "http://127.0.0.1:25302","http://localhost:3000"], supports_credentials=True)
+app.secret_key = os.getenv("SECRET_KEY", "dev_secret_key_fixed_for_stability")
 
 # Replace with your Neo4j connection details
 NEO4J_URI = os.getenv("NEO4J_URI")
@@ -26,14 +27,26 @@ DATABASE_TYPE = os.getenv("DATABASE_TYPE", "neo4j")
 
 # if not NEO4J_URI:
 #     raise ValueError("NEO4J_URI not found in .env file")
-
 # Replace with your Memgraph connection details
 # NEO4J_URI = "bolt://localhost:23004"
 # NEO4J_USER = ""
 # NEO4J_PASSWORD = ""
 # DATABASE_TYPE = "memgraph"
+# Global storage for sessions
+# Key: session_id (str), Value: GramxNeo4j instance
+gramx_sessions = {}
 
-gramx = None
+def get_session_id():
+    header_uid = request.headers.get('X-Session-ID')
+    if header_uid:
+        return header_uid
+    if 'uid' not in session:
+        session['uid'] = str(uuid.uuid4())
+    return session['uid']
+
+def get_gramx():
+    uid = get_session_id()
+    return gramx_sessions.get(uid)
 
 @app.route('/api/schema', methods=['GET'])
 def get_schema():
@@ -44,7 +57,6 @@ def get_schema():
         # Debugging: Write schema to a file
         with open("debug_schema.json", "w") as f:
             json.dump(schema, f, indent=2)
-        print("DEBUG: Schema written to debug_schema.json")
 
         cardinality = gram.relationship_cardinality
         gram.close()
@@ -55,7 +67,7 @@ def get_schema():
 
 @app.route('/api/analyze', methods=['POST'])
 def analyze():
-    global gramx
+    uid = get_session_id()
     try:
         data = request.json
         node_labels = data.get('node_labels', [])
@@ -65,6 +77,13 @@ def analyze():
         confidence = data.get('confidence', 0.5)
         max_length = data.get('max_length', 3)
         conditions = data.get('conditions', {})  # Extract conditions
+
+        # Close previous session instance if it exists to free resources
+        if uid in gramx_sessions:
+            try:
+                gramx_sessions[uid].close()
+            except Exception as e:
+                print(f"Error closing previous session: {e}")
 
         # Pass conditions to GramxNeo4j
         gramx = GramxNeo4j(NEO4J_URI, NEO4J_USER, NEO4J_PASSWORD, conditions=conditions, database_type=DATABASE_TYPE)
@@ -76,7 +95,11 @@ def analyze():
         gramx.set_support_and_confidence(support, confidence)
         gramx.build_forest(max_depth=max_length)
 
+        # Store in session
+        gramx_sessions[uid] = gramx
+
         return jsonify({
+            "session_id": uid,
             "anchor_counts": gramx.anchor_counts,
             "forest": gramx.forest,
             "patterns": gramx.patterns
@@ -87,7 +110,8 @@ def analyze():
 
 @app.route('/api/patterns', methods=['POST'])
 def get_patterns():
-    global gramx
+    gramx = get_gramx()
+    
     if not gramx:
         return jsonify({"error": "Analysis not initialized. Please run analysis first."}), 400
     try:
@@ -138,7 +162,7 @@ def get_patterns():
 
 @app.route('/api/patterns/csv', methods=['GET'])
 def get_patterns_csv():
-    global gramx
+    gramx = get_gramx()
     if not gramx or not hasattr(gramx, 'pattern_results'):
         return jsonify({"error": "No patterns available. Run analysis first."}), 400
     
@@ -178,7 +202,7 @@ def get_patterns_csv():
 
 @app.route('/api/patterns/<pattern_id>/instances', methods=['GET'])
 def get_pattern_instances(pattern_id):
-    global gramx
+    gramx = get_gramx()
     if not gramx or not hasattr(gramx, 'pattern_results'):
         return jsonify({"error": "Analysis not initialized or patterns not queried."}), 400
     
@@ -216,7 +240,7 @@ def get_pattern_instances(pattern_id):
 
 @app.route('/api/combine', methods=['POST'])
 def combine_patterns():
-    global gramx
+    gramx = get_gramx()
     if not gramx:
         return jsonify({"error": "Analysis not initialized."}), 400
     
@@ -240,7 +264,7 @@ def combine_patterns():
 
 @app.route('/api/combinations/csv', methods=['GET'])
 def get_combinations_csv():
-    global gramx
+    gramx = get_gramx()
     if not gramx:
         return jsonify({"error": "Analysis not initialized."}), 400
     
@@ -317,7 +341,7 @@ def get_combinations_csv():
 
 @app.route('/api/rules', methods=['POST'])
 def get_rules():
-    global gramx
+    gramx = get_gramx()
     if not gramx:
         return jsonify({"error": "Analysis not initialized."}), 400
     
@@ -347,7 +371,7 @@ def get_rules():
 
 @app.route('/api/rules/csv', methods=['GET'])
 def get_rules_csv():
-    global gramx
+    gramx = get_gramx()
     # Allow if either association_rules OR last_generated_rules exists
     if not gramx:
          return jsonify({"error": "Analysis not initialized."}), 400
@@ -432,7 +456,7 @@ def get_rules_csv():
 
 @app.route('/api/node-names', methods=['POST'])
 def get_node_names():
-    global gramx
+    gramx = get_gramx()
     if not gramx:
         return jsonify({"error": "Analysis not initialized."}), 400
     try:
@@ -448,7 +472,6 @@ def get_node_names():
 
 if __name__ == '__main__':
     try:
-        print("DEBUG: About to run Flòask app.")
         app.run(debug=True, port=8081)
     except Exception as e:
         app.logger.error(f"Failed to start Flask application: {e}", exc_info=True)

@@ -1,44 +1,34 @@
-# Stage 1: Build the React app
-FROM node:18 AS build
-
-# Set the working directory
+# Build stage
+FROM node:18-alpine AS build
 WORKDIR /app
 
-# Copy package.json and package-lock.json
-COPY minegraph-frontend/package.json minegraph-frontend/package-lock.json ./
+# Copy package.json and package-lock.json (if available)
+# These are inside the frontend subdirectory
+COPY gram-frontend/package.json gram-frontend/package-lock.json ./
 
 # Install dependencies
 RUN npm install
 
-# Copy the rest of the application's code
-COPY minegraph-frontend/ ./
+# Copy the rest of the frontend source code
+COPY gram-frontend/ ./
 
-# Build the app
+# Build the React app
 RUN npm run build
 
-# Stage 2: Serve the app with Nginx
+# Production stage
 FROM nginx:alpine
 
-# Install envsubst if not present (usually present in alpine-nginx)
-RUN apk add --no-cache gettext
-
-# Copy the nginx config file
-COPY minegraph-frontend/nginx.conf /etc/nginx/conf.d/default.conf.template
-
-# Copy the build output to replace the default Nginx public folder
+# Copy the build artifacts from the build stage
 COPY --from=build /app/build /usr/share/nginx/html
 
-# Copy and prepare the entrypoint script
-COPY minegraph-frontend/entrypoint.sh /entrypoint.sh
+# Copy custom Nginx configuration if needed
+COPY gram-frontend/nginx.conf /etc/nginx/conf.d/default.conf.template
+
+# entrypoint.sh to handle environment variables in frontend
+COPY gram-frontend/entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
-# Define the default environment variable
-ENV BASE_PATH=/
-
-ENTRYPOINT ["/entrypoint.sh"]
-
-# Expose port 80
 EXPOSE 80
 
-# Start Nginx
+ENTRYPOINT ["/entrypoint.sh"]
 CMD ["nginx", "-g", "daemon off;"]

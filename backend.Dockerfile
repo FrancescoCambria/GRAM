@@ -12,7 +12,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy the content of the local src directory to the working directory
 COPY backend.py .
-COPY gramx_neo4j.py .
+COPY gram.py .
 COPY llm_judge.py .
 COPY .env .
 COPY data/ ./data
