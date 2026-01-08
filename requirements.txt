@@ -1,0 +1,7 @@
+flask
+python-dotenv
+flask-cors
+neo4j
+pandas
+bitarray
+openpyxl

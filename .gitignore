@@ -1,0 +1,31 @@
+# Byte-compiled / Optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+venv/
+env/
+.venv/
+
+# Environment variables (Keep these secret!)
+.env
+
+# folders
+data/
+old_python/
+test/
+
+# Mac/Windows system files
+.DS_Store
+Thumbs.db
+
+#files
+debug_schema.json
+
+#frontend
+gram-frontend/node_modules/
+gram-frontend/build/
+gram-frontend/.pnp
+gram-frontend/.pnp.js
+gram-frontend/.env
