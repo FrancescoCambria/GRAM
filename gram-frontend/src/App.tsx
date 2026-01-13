@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Container, Row, Col, Card, Form, Button, ListGroup, OverlayTrigger, Tooltip, Modal, Spinner, InputGroup } from 'react-bootstrap';
+import { Container, Row, Col, Card, Form, Button, ListGroup, OverlayTrigger, Tooltip, Modal, Spinner, InputGroup, Dropdown } from 'react-bootstrap';
 import CytoscapeComponent from 'react-cytoscapejs';
 import cytoscape from 'cytoscape';
 import 'bootstrap-icons/font/bootstrap-icons.css';
@@ -423,7 +423,20 @@ function App() {
 
   return (
     <Container fluid>
-      <h1 className="my-4">Graph Rule Association Miner</h1>
+      <div className="d-flex justify-content-between align-items-center my-4">
+        <h1 className="mb-0">GRaph Association rules Miner</h1>
+        <Dropdown>
+          <Dropdown.Toggle variant="secondary" id="dropdown-basic">
+            Switch Database
+          </Dropdown.Toggle>
+
+          <Dropdown.Menu align="end">
+            <Dropdown.Item href="https://cerilab.deib.polimi.it/gram_spotify">Spotify Playlist</Dropdown.Item>
+            <Dropdown.Item href="https://cerilab.deib.polimi.it/gram_law">Italian Legislation</Dropdown.Item>
+            <Dropdown.Item href="https://cerilab.deib.polimi.it/gram_arxiv">ArXiv Citations</Dropdown.Item>
+          </Dropdown.Menu>
+        </Dropdown>
+      </div>
       <Row>
         <Col md={4}>
           <Card className="mb-4" style={{ height: '450px' }}>
