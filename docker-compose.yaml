@@ -1,5 +1,5 @@
 services:
-  backend:
+  backend-spotify:
     build:
       context: .
       dockerfile: backend.Dockerfile
@@ -13,7 +13,7 @@ services:
     networks:
       - minegraph-network
 
-  frontend:
+  frontend-spotify:
     build:
       context: .
       dockerfile: frontend.Dockerfile
@@ -22,6 +22,65 @@ services:
     environment:
       - BASE_PATH=/
       - REACT_APP_BACKEND_URL=https://cerilab.deib.polimi.it/gram_api
+      - PUBLIC_URL=https://cerilab.deib.polimi.it/gram
+    depends_on:
+      - backend
+    networks:
+      - minegraph-network
+
+  backend-laws:
+    build:
+      context: .
+      dockerfile: backend.Dockerfile
+    ports:
+      - "25303:5001"
+    environment:
+      - NEO4J_URI=neo4j://gram_test:7687
+      - NEO4J_USER=${NEO4J_USER}
+      - NEO4J_PASSWORD=${NEO4J_PASSWORD}
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+    networks:
+      - minegraph-network
+
+  frontend-laws:
+    build:
+      context: .
+      dockerfile: frontend.Dockerfile
+    ports:
+      - "25304:80"
+    environment:
+      - BASE_PATH=/
+      - REACT_APP_BACKEND_URL=https://cerilab.deib.polimi.it/gram_api_law
+      - PUBLIC_URL=https://cerilab.deib.polimi.it/gram_law
+    depends_on:
+      - backend
+    networks:
+      - minegraph-network
+
+  backend-arxiv:
+    build:
+      context: .
+      dockerfile: backend.Dockerfile
+    ports:
+      - "25305:5001"
+    environment:
+      - NEO4J_URI=neo4j://gram_test:7687
+      - NEO4J_USER=${NEO4J_USER}
+      - NEO4J_PASSWORD=${NEO4J_PASSWORD}
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+    networks:
+      - minegraph-network
+
+  frontend-arxiv:
+    build:
+      context: .
+      dockerfile: frontend.Dockerfile
+    ports:
+      - "25306:80"
+    environment:
+      - BASE_PATH=/
+      - REACT_APP_BACKEND_URL=https://cerilab.deib.polimi.it/gram_api_arxiv
+      - PUBLIC_URL=https://cerilab.deib.polimi.it/gram_law_arxiv
     depends_on:
       - backend
     networks:
