@@ -425,6 +425,7 @@ function App() {
     <Container fluid>
       <div className="d-flex justify-content-between align-items-center my-4">
         <h1 className="mb-0">GRaph Association rules Miner</h1>
+        <div className="d-flex gap-2">
         <Button 
         variant="outline-danger" 
         onClick={() => window.location.reload()}
@@ -442,6 +443,7 @@ function App() {
             <Dropdown.Item href="https://cerilab.deib.polimi.it/gram_arxiv">ArXiv Citations</Dropdown.Item>
           </Dropdown.Menu>
         </Dropdown>
+        </div>
       </div>
       <Row>
         <Col md={4}>
