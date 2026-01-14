@@ -425,6 +425,12 @@ function App() {
     <Container fluid>
       <div className="d-flex justify-content-between align-items-center my-4">
         <h1 className="mb-0">GRaph Association rules Miner</h1>
+        <Button 
+        variant="outline-danger" 
+        onClick={() => window.location.reload()}
+      >
+        Reset
+      </Button>
         <Dropdown>
           <Dropdown.Toggle variant="secondary" id="dropdown-basic">
             Switch Database
