@@ -61,6 +61,7 @@ function App() {
   const [newConditionValue, setNewConditionValue] = useState<string>('');
   const [showConditionsModal, setShowConditionsModal] = useState(false);
   const [sessionId, setSessionId] = useState<string | null>(null);
+  const ruleVisualizationRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const fetchSchema = async () => {
@@ -229,6 +230,11 @@ function App() {
       });
       const data = await response.json();
       setRules(data);
+      
+      // Scroll to Rule Visualization card
+      setTimeout(() => {
+        ruleVisualizationRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 100);
     } catch (error) {
       console.error('Error fetching rules:', error);
       alert('Rule generation failed. See console for details.');
@@ -702,7 +708,7 @@ function App() {
       </Row>
 
       {rules && !isFetchingRules && (
-        <Row className="mt-4">
+        <Row className="mt-4" ref={ruleVisualizationRef}>
           <Col md={12}>
             <Card>
               <Card.Header className="d-flex justify-content-between align-items-center fw-bold">
