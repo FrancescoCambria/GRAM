@@ -2,6 +2,13 @@
 FROM node:18-alpine AS build
 WORKDIR /app
 
+ARG REACT_APP_BACKEND_URL
+ARG PUBLIC_URL
+
+# Make the ARGs available as ENV for the build process
+ENV REACT_APP_BACKEND_URL=$REACT_APP_BACKEND_URL
+ENV PUBLIC_URL=$PUBLIC_URL
+
 # Copy package.json and package-lock.json (if available)
 # These are inside the frontend subdirectory
 COPY gram-frontend/package.json gram-frontend/package-lock.json ./

@@ -14,7 +14,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY backend.py .
 COPY gram.py .
 COPY llm_judge.py .
-COPY .env .
+#COPY .env .
 COPY data/ ./data
 
 # Make port 5001 available to the world outside this container
