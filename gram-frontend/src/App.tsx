@@ -36,7 +36,7 @@ function App() {
   const [selectedNodeLabels, setSelectedNodeLabels] = useState<string[]>([]);
   const [selectedEdgeTypes, setSelectedEdgeTypes] = useState<string[]>([]);
   const [anchors, setAnchors] = useState<string[]>([]);
-  const [support, setSupport] = useState(0.1);
+  const [support, setSupport] = useState(0.001);
   const [confidence, setConfidence] = useState(0.5);
   const [maxLength, setMaxLength] = useState(3);
   const [maxCombinationSize, setMaxCombinationSize] = useState(3);
@@ -425,6 +425,12 @@ function App() {
     <Container fluid>
       <div className="d-flex justify-content-between align-items-center my-4">
         <h1 className="mb-0">GRaph Association rules Miner</h1>
+        <Button 
+        variant="outline-danger" 
+        onClick={() => window.location.reload()}
+      >
+        Reset
+      </Button>
         <Dropdown>
           <Dropdown.Toggle variant="secondary" id="dropdown-basic">
             Switch Database
@@ -567,11 +573,11 @@ function App() {
                     <h5 className="mb-3">Settings</h5>
                     <Form.Group className="mb-2">
                       <Form.Label className="small mb-1">Support</Form.Label>
-                      <Form.Control type="number" value={support} onChange={handleSupportChange} size="sm" />
+                      <Form.Control type="number" value={support} onChange={handleSupportChange} size="sm" step="0.01" min="0" max="1"/>
                     </Form.Group>
                     <Form.Group className="mb-2">
                        <Form.Label className="small mb-1">Confidence</Form.Label>
-                       <Form.Control type="number" value={confidence} onChange={handleConfidenceChange} size="sm" />
+                       <Form.Control type="number" value={confidence} onChange={handleConfidenceChange} size="sm" step="0.01" min="0" max="1"/>
                     </Form.Group>
                     <Form.Group className="mb-2">
                        <Form.Label className="small mb-1">Max Length</Form.Label>
