@@ -16,7 +16,14 @@ from gram import GramxNeo4j
 load_dotenv()
 
 app = Flask(__name__)
-CORS(app, origins=["https://cerilab.deib.polimi.it/gram", "http://127.0.0.1:25302","http://localhost:3000"], supports_credentials=True)
+CORS(app, origins=["https://cerilab.deib.polimi.it/gram", 
+                   "https://cerilab.deib.polimi.it/gram_arxiv",
+                   "https://cerilab.deib.polimi.it/gram_law",
+                   "https://cerilab.deib.polimi.it/gram_spotify",
+                   "http://127.0.0.1:25302",
+                   "http://127.0.0.1:25304",
+                   "http://127.0.0.1:25306",
+                   "http://localhost:3000"], supports_credentials=True)
 app.secret_key = os.getenv("SECRET_KEY", "dev_secret_key_fixed_for_stability")
 
 # Replace with your Neo4j connection details
